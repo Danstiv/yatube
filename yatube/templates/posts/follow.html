@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% load cache %}
+{% block title %}Записи избранных авторов{% endblock %}
+{% block content %}
+  <div class="container py-5">     
+    <h1>Записи избранных авторов</h1>
+    {% include 'posts/includes/switcher.html' %}
+    {% include 'posts/includes/posts.html' %}
+  </div>  
+{% endblock %}

@@ -1,0 +1,10 @@
+{% for post in page_obj %}
+  {% include 'posts/includes/post.html' %}
+  {% if post.group %}
+    <a href="{{ post.group.get_absolute_url }}">
+      все записи группы
+    </a>
+  {% endif %}
+  {% if not forloop.last %}<hr>{% endif %}
+{% endfor %}
+{% include 'posts/includes/paginator.html' %}
