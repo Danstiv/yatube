@@ -135,6 +135,7 @@ class FormTests(TestCase):
         self.assertEqual(Comment.objects.count(), comments_count + 1)
         new_comment = Comment.objects.all().order_by('-id')[0]
         self.assertEqual(new_comment.text, comment_text)
+        self.assertEqual(new_comment.post, self.post)
 
     def test_create_post_by_anonymous_user(self):
         """Анонимный пользователь не может создать пост"""

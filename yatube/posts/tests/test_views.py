@@ -10,7 +10,7 @@ from django.test import Client, TestCase, override_settings
 from django.urls import reverse
 from django import forms
 
-from ..models import Post, Group
+from ..models import Follow, Post, Group
 
 User = get_user_model()
 TEMP_MEDIA_ROOT = tempfile.mkdtemp(dir=settings.BASE_DIR)
@@ -23,6 +23,8 @@ class ViewTests(TestCase):
     def setUpClass(cls):
         super().setUpClass()
         cls.user = User.objects.create_user(username='new_user')
+        cls.user_follower = User.objects.create_user(username='follower')
+        Follow.objects.create(user=cls.user_follower, author=cls.user)
         cls.users = [
             User.objects.create_user(username='user1'),
             User.objects.create_user(username='user2')
@@ -68,6 +70,8 @@ class ViewTests(TestCase):
     def setUp(self):
         self.client = Client()
         self.client.force_login(ViewTests.user)
+        self.client_follower = Client()
+        self.client_follower.force_login(ViewTests.user_follower)
         self.clients = []
         for user in ViewTests.users:
             client = Client()
@@ -216,12 +220,17 @@ class ViewTests(TestCase):
 
     def test_authorized_user_can_follow_other_user(self):
         """Авторизованный пользователь может подписываться
-        На других пользователей
-        и отписываться от них."""
+        На других пользователей."""
         user_url = ViewTests.users[0].get_absolute_url()
         # Изначально пользователь должен быть отписан
         response = self.client.get(user_url)
         self.assertFalse(response.context['following'])
+        self.assertFalse(
+            Follow.objects.filter(
+                user=ViewTests.user,
+                author=ViewTests.users[0]
+            ).exists()
+        )
         response = self.client.get(
             reverse(
                 'posts:profile_follow',
@@ -231,15 +240,36 @@ class ViewTests(TestCase):
         )
         self.assertRedirects(response, user_url)
         self.assertTrue(response.context['following'])
-        response = self.client.get(
+        self.assertTrue(
+            Follow.objects.filter(
+                user=ViewTests.user,
+                author=ViewTests.users[0]
+            ).exists()
+        )
+
+    def test_authorized_user_can_unfollow_other_user(self):
+        """Авторизованный пользователь
+        может отписаться от другого пользователя."""
+        user_url = ViewTests.user.get_absolute_url()
+        response = self.client_follower.get(user_url)
+        self.assertTrue(response.context['following'])
+        # Базу данных можно не проверять,
+        # Так как объект подписки был явно создан в setUpClass
+        response = self.client_follower.get(
             reverse(
                 'posts:profile_unfollow',
-                args=[ViewTests.users[0].username]
+                args=[ViewTests.user.username]
             ),
             follow=True
         )
         self.assertRedirects(response, user_url)
         self.assertFalse(response.context['following'])
+        self.assertFalse(
+            Follow.objects.filter(
+                user=ViewTests.user_follower,
+                author=ViewTests.user
+            ).exists()
+        )
 
     def test_post_appears_in_feed(self):
         """Пост появляется в ленте у пользователей,

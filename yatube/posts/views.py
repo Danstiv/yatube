@@ -11,7 +11,7 @@ User = get_user_model()
 
 
 def index(request):
-    posts = Post.objects.all()
+    posts = Post.objects.select_related('group').all()
     page_obj = get_page_obj(request, posts)
     template = 'posts/index.html'
     context = {
@@ -111,13 +111,8 @@ def follow_index(request):
 @login_required
 def profile_follow(request, username):
     author = get_object_or_404(User, username=username)
-    # Пользователь не пытается подписаться сам на себя,
-    # и он ещё не подписан
-    if (
-        request.user != author and not
-        Follow.objects.filter(user=request.user, author=author).exists()
-    ):
-        Follow.objects.create(user=request.user, author=author)
+    if request.user != author:  # Пользователь не пытается подписаться на себя.
+        Follow.objects.get_or_create(user=request.user, author=author)
     return redirect(author)
 
 
