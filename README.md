@@ -1,3 +1,86 @@
-# hw05_final
+# YaTube
 
-[![CI](https://github.com/yandex-praktikum/hw05_final/actions/workflows/python-app.yml/badge.svg?branch=master)](https://github.com/yandex-praktikum/hw05_final/actions/workflows/python-app.yml)
+Социальная сеть для публикации личных дневников.
+
+Имеющиеся возможности:
+
+1. Регистрация, авторизация, восстановление пароля.
+2. Публикация текстовых постов с возможностью добавления превью-картинок.
+3. Подписки на авторов и просмотр ленты постов авторов, на которых подписан пользователь.
+4. Объединение постов на схожую тематику в группы и просмотр постов, входящих в группу.
+5. Комментирование постов.
+
+## Технологии
+
+- Python3
+- Django
+
+## Как запустить проект
+
+### Linux
+
+Создать и активировать виртуальное окружение:
+
+```
+python3 -m venv env
+```
+
+```
+source env/bin/activate
+```
+
+```
+python3 -m pip install --upgrade pip
+```
+
+```
+pip install -r requirements.txt
+```
+
+Выполнить миграции:
+
+```
+python3 manage.py migrate
+```
+
+Запустить проект:
+
+```
+python3 manage.py runserver
+```
+
+### Windows
+
+Создать и активировать виртуальное окружение:
+
+```
+python -m venv env
+```
+
+```
+env\scripts\activate
+```
+
+```
+python -m pip install --upgrade pip
+```
+
+```
+pip install -r requirements.txt
+```
+
+Выполнить миграции:
+
+```
+python manage.py migrate
+```
+
+Запустить проект:
+
+```
+python manage.py runserver
+```
+
+## Тесты
+
+Репозиторий содержит pytest-тесты, они были предоставлены автором шаблона данного проекта.
